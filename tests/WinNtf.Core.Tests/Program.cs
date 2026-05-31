@@ -24,6 +24,7 @@ public static class Program
             (nameof(LocalHttpServerTests.NotifyAcceptsLowercaseVariant), LocalHttpServerTests.NotifyAcceptsLowercaseVariant),
             (nameof(LocalHttpServerTests.NotifyAcceptsKebabCasePosition), LocalHttpServerTests.NotifyAcceptsKebabCasePosition),
             (nameof(LocalHttpServerTests.NotifyRejectsOversizedPayload), LocalHttpServerTests.NotifyRejectsOversizedPayload),
+            (nameof(LocalHttpServerTests.NotifyRejectsShortBody), LocalHttpServerTests.NotifyRejectsShortBody),
         };
 
         var failures = 0;
