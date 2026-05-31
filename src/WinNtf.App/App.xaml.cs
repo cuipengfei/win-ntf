@@ -1,6 +1,5 @@
 using System.Windows;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Hosting;
+using System.IO;
 using WinNtf.Core;
 using WinNtf.Server;
 
@@ -9,7 +8,7 @@ namespace WinNtf.App;
 public partial class App : System.Windows.Application
 {
     private SingleInstanceGuard? _singleInstance;
-    private WebApplication? _server;
+    private LocalHttpServer? _server;
     private TrayController? _tray;
 
     protected override void OnStartup(StartupEventArgs e)
@@ -25,6 +24,8 @@ public partial class App : System.Windows.Application
 
         try
         {
+            Directory.SetCurrentDirectory(Path.GetDirectoryName(CurrentExecutablePath())!);
+
             var configPath = AppConfigStore.DefaultPath();
             var config = new AppConfigStore(configPath).LoadOrCreate();
             new RegistryStartupManager().SetEnabled(config.StartOnLogin, CurrentExecutablePath());
@@ -33,8 +34,8 @@ public partial class App : System.Windows.Application
             _server = new LocalHttpServer(
                 new LocalHttpServerOptions(config.Port),
                 new NotificationNormalizer(),
-                sink).Build();
-            _server.Start();
+                sink);
+            _ = _server.StartAsync();
 
             _tray = new TrayController(
                 config,
@@ -47,6 +48,7 @@ public partial class App : System.Windows.Application
                     NotificationNormalizer.DefaultDurationMs,
                     config.DefaultPosition,
                     Persistent: false), CancellationToken.None),
+                DismissAllPopups,
                 Shutdown);
         }
         catch (Exception ex)
@@ -62,8 +64,6 @@ public partial class App : System.Windows.Application
 
         if (_server is not null)
         {
-            using var stopTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(2));
-            await _server.StopAsync(stopTimeout.Token);
             await _server.DisposeAsync();
         }
 
@@ -74,4 +74,12 @@ public partial class App : System.Windows.Application
     private static string CurrentExecutablePath() =>
         Environment.ProcessPath
         ?? throw new InvalidOperationException("Cannot resolve current executable path");
+
+    private static void DismissAllPopups()
+    {
+        foreach (var window in Current.Windows.OfType<PopupWindow>().ToList())
+        {
+            window.Close();
+        }
+    }
 }
