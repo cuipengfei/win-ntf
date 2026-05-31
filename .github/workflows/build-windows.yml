@@ -34,7 +34,14 @@ jobs:
 
       - name: Smoke packaged app
         shell: pwsh
-        run: ./dist/win-ntf/smoke-win.ps1 -ExePath ./dist/win-ntf/win-ntf.exe
+        run: ./dist/win-ntf/smoke-win.ps1 -ExePath ./dist/win-ntf/win-ntf.exe -ScreenshotPath ./dist/win-ntf-smoke.png -DurationMs 15000
+
+      - name: Upload smoke screenshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: win-ntf-smoke-screenshot
+          path: dist/win-ntf-smoke.png
+          if-no-files-found: error
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

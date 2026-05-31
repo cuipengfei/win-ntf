@@ -13,7 +13,19 @@ New-Item -ItemType Directory -Force -Path "dist" | Out-Null
 
 dotnet publish src/WinNtf.App/WinNtf.App.csproj `
   -c Release `
+  --runtime win-x64 `
+  --self-contained true `
+  -p:PublishSingleFile=true `
+  -p:EnableCompressionInSingleFile=true `
   -o $publishDir
+
+if ($LASTEXITCODE -ne 0) {
+  throw "dotnet publish failed with exit code $LASTEXITCODE"
+}
+
+if (-not (Test-Path "$publishDir\win-ntf.exe")) {
+  throw "publish did not produce $publishDir\win-ntf.exe"
+}
 
 $readme = @"
 win-ntf Windows x64 package
