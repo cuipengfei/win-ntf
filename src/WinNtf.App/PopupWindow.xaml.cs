@@ -22,7 +22,8 @@ public partial class PopupWindow : Window
         TitleText.Text = notification.Title;
         BodyText.Text = notification.Text;
         IconText.Text = IconFor(notification.Variant);
-        AccentBar.Background = BrushFor(notification.Color);
+        StateBorder.BorderBrush = BrushFor(notification.Color);
+        IconContainer.Background = TintedBrushFor(notification.Color);
 
         SourceInitialized += (_, _) => PreventActivation();
         Loaded += (_, _) => ApplyPosition(notification.Position, slot);
@@ -85,6 +86,12 @@ public partial class PopupWindow : Window
 
     private static System.Windows.Media.Brush BrushFor(string color) =>
         (System.Windows.Media.Brush)new BrushConverter().ConvertFromString(color)!;
+
+    private static System.Windows.Media.Brush TintedBrushFor(string color)
+    {
+        var parsed = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(color);
+        return new SolidColorBrush(System.Windows.Media.Color.FromArgb(0x26, parsed.R, parsed.G, parsed.B));
+    }
 
     private const int GwlExStyle = -20;
     private const int WsExNoActivate = 0x08000000;

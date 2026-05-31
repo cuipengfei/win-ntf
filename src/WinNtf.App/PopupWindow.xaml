@@ -9,36 +9,75 @@
         Background="Transparent"
         Topmost="True"
         ShowInTaskbar="False"
-        ShowActivated="False">
-    <Border CornerRadius="14" Background="#F0101018" Margin="10">
+        ShowActivated="False"
+        TextOptions.TextFormattingMode="Display"
+        TextOptions.TextRenderingMode="ClearType">
+    <Window.Triggers>
+        <EventTrigger RoutedEvent="Window.Loaded">
+            <BeginStoryboard>
+                <Storyboard>
+                    <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.16" />
+                    <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)" From="8" To="0" Duration="0:0:0.16" />
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+    </Window.Triggers>
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Foreground" Value="#BBBBBB" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="HoverSurface" Background="{TemplateBinding Background}" CornerRadius="13">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="HoverSurface" Property="Background" Value="#1AFFFFFF" />
+                                <Setter Property="Foreground" Value="#FFFFFF" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    <Border x:Name="StateBorder" CornerRadius="14" Background="#F0101018" BorderBrush="#1AFFFFFF" BorderThickness="1" Margin="10" RenderTransformOrigin="0.5,0.5">
+        <Border.RenderTransform>
+            <TranslateTransform />
+        </Border.RenderTransform>
         <Border.Effect>
-            <DropShadowEffect BlurRadius="16" ShadowDepth="0" Opacity="0.4" Color="Black" />
+            <DropShadowEffect BlurRadius="12" ShadowDepth="2" Direction="270" Opacity="0.25" Color="Black" />
         </Border.Effect>
-        <Grid>
-            <Border x:Name="AccentBar" Width="5" HorizontalAlignment="Left" Background="#60A5FA" CornerRadius="14,0,0,14" />
+        <Grid Margin="16,12,14,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="38" />
+                <ColumnDefinition Width="14" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="34" />
+            </Grid.ColumnDefinitions>
+            <Border x:Name="IconContainer" Grid.Column="0" Width="36" Height="36" CornerRadius="18" HorizontalAlignment="Center" VerticalAlignment="Center" Background="#2660A5FA">
+                <TextBlock x:Name="IconText" Text="ℹ️" FontSize="23" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Border>
+            <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                <TextBlock x:Name="TitleText" Text="win-ntf" Foreground="#FFFFFF" FontSize="14" FontWeight="SemiBold" />
+                <TextBlock x:Name="BodyText" Text="Local notifier" Foreground="#9CA3AF" FontSize="12" Margin="0,4,0,0" TextWrapping="Wrap" MaxHeight="40" />
+            </StackPanel>
             <Button x:Name="CloseButton"
+                    Grid.Column="3"
                     Content="×"
                     Width="26"
                     Height="26"
-                    HorizontalAlignment="Right"
+                    HorizontalAlignment="Center"
                     VerticalAlignment="Top"
-                    Margin="0,12,16,0"
                     Click="CloseButton_Click"
                     ToolTip="Close notification"
                     Focusable="False"
-                    Background="Transparent"
-                    BorderThickness="0"
-                    Foreground="#BBBBBB"
                     FontSize="18"
                     FontWeight="SemiBold"
                     Cursor="Hand" />
-            <StackPanel Orientation="Horizontal" Margin="22,12,48,12" VerticalAlignment="Center">
-                <TextBlock x:Name="IconText" Text="ℹ️" FontSize="30" VerticalAlignment="Center" Margin="0,0,15,0" />
-                <StackPanel VerticalAlignment="Center" MaxWidth="300">
-                    <TextBlock x:Name="TitleText" Text="win-ntf" Foreground="#FFFFFF" FontSize="14" FontWeight="SemiBold" />
-                    <TextBlock x:Name="BodyText" Text="Local notifier" Foreground="#AAAAAA" FontSize="11" Margin="0,4,0,0" TextWrapping="Wrap" />
-                </StackPanel>
-            </StackPanel>
         </Grid>
     </Border>
 </Window>
