@@ -1,0 +1,21 @@
+bin/
+obj/
+.vs/
+.vscode/
+*.user
+*.suo
+TestResults/
+coverage/
+*.log
+publish/
+
+dist/
+# Agent/runtime state
+.omx/
+
+# Local packaging/test artifacts
+*.7z
+*.zip
+*.nupkg
+*.snupkg
+*.png

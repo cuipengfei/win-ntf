@@ -1,0 +1,12 @@
+<Window x:Class="WinNtf.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="win-ntf"
+        Width="360"
+        Height="160"
+        WindowStartupLocation="CenterScreen">
+    <StackPanel Margin="18">
+        <TextBlock Text="win-ntf is running" FontSize="16" FontWeight="SemiBold" />
+        <TextBlock Text="Use the tray icon to send a test notification, open config, or exit." TextWrapping="Wrap" Margin="0,8,0,0" />
+    </StackPanel>
+</Window>

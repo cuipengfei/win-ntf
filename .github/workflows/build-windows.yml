@@ -1,0 +1,44 @@
+name: build-windows
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+  pull_request:
+
+jobs:
+  build-win-x64:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Build
+        run: dotnet build WinNtf.sln --configuration Release
+
+      - name: Test
+        run: dotnet run --project tests/WinNtf.Core.Tests/WinNtf.Core.Tests.csproj --configuration Release
+
+      - name: Publish and package 7z
+        shell: pwsh
+        run: ./scripts/package-win-x64.ps1
+
+      - name: Smoke packaged app
+        shell: pwsh
+        run: ./dist/win-ntf/smoke-win.ps1 -ExePath ./dist/win-ntf/win-ntf.exe
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: win-ntf-win-x64
+          path: dist/win-ntf-win-x64.7z
+          if-no-files-found: error
