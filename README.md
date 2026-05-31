@@ -31,17 +31,32 @@ agent hook -> POST http://127.0.0.1:<port>/notify -> WPF custom popup
 
 ```bash
 export PATH="$HOME/.dotnet:$PATH"
-dotnet build WinNtf.sln
-dotnet run --project tests/WinNtf.Core.Tests/WinNtf.Core.Tests.csproj
+make build
+make test
 ```
+
+## 发布方式
+
+仓库提供两种 Windows x64 发布产物：
+
+```bash
+make publish-self-contained       # 输出 dist/win-ntf-self-contained，目标机无需预装 .NET
+make publish-framework-dependent  # 输出 dist/win-ntf-framework-dependent，目标机需预装 .NET Desktop Runtime + ASP.NET Core Runtime
+```
+
+`self-contained` 体积更大，适合直接发给没有 .NET 的 Windows 机器。`framework-dependent` 体积更小，只适合已安装匹配 .NET Desktop Runtime **和 ASP.NET Core Runtime** 的机器；本程序用 WPF 显示 popup，同时用 Kestrel 提供本地 HTTP 端点，所以两个 shared runtime 都需要。
+
+`scripts/package-win-x64.ps1` 仍保留为压缩包入口：它显式执行 self-contained win-x64 publish，输出 `dist/win-ntf/` 并打包成 `dist/win-ntf-win-x64.7z`，供 CI artifact 使用。
 
 ## Windows 真实 smoke test
 
-解压 `win-ntf-win-x64.7z` 后，可以直接运行脚本：
+对 `make publish-*` 生成的目录，进入对应目录后运行：
 
 ```powershell
-.\smoke-win.ps1 -ExePath .\win-ntf.exe
+.\smoke-win.ps1 -ExePath .\win-ntf.exe -ScreenshotPath .\smoke.png -DurationMs 15000
 ```
+
+解压 `win-ntf-win-x64.7z` 后同样可以在解压目录运行这条命令。脚本会启动程序、等待 `/health` 返回 `ok`、发送 `/notify`、确认当前进程出现可见 `win-ntf` popup 后截图，并在结束时关闭本次启动的进程。`DurationMs` 可调长弹窗停留时间，避免截图太晚错过 popup。`-RemoveTempDir` 只会删除 exe 所在且目录名匹配 `wnt-*` 的测试临时目录；正式 `dist/win-ntf-*` 发布目录不会被它删除。
 
 也可以手动启动 `win-ntf.exe`。启动后，托盘应显示 `win-ntf alive on 127.0.0.1:9876`。
 

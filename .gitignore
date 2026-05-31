@@ -19,3 +19,5 @@ dist/
 *.nupkg
 *.snupkg
 *.png
+.omo/ralph-loop.local.md
+.omo/run-continuation/
