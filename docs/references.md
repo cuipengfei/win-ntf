@@ -24,3 +24,9 @@
 - `packages/oc-tweaks/src/plugins/tool-call-notify.ts`
   - 可借鉴：`maxVisible = 3`、`top-right`、短时 tool-call 通知。
 
+
+## Agent hook 参考
+
+- opencode: `~/.config/opencode/plugins/win-ntf-notify.ts` 监听 `session.idle`、`session.error`、`permission.asked` / `permission.updated` / `question.asked`；`session.idle` 事件只带 `sessionID`，插件用 `client.session.get({ path: { id } })` 读取 `parentID`，跳过 subagent idle。
+- Claude Code: `~/.claude/settings.json` hooks 调用 `~/.claude/hooks/win-ntf-notify.sh`；`Stop` 用作 idle，`StopFailure` 用作 error，`PermissionRequest`/`Notification` 用作 approval，`PreToolUse` + `AskUserQuestion` 用作 question。
+- Codex: `~/.codex/hooks.json` 调用 `~/.codex/hooks/win-ntf-notify.sh`；`Stop` 用作 idle，`PermissionRequest` 用作 approval，`PreToolUse` matcher 捕获 question，`PostToolUse` 非零状态近似 error。Codex 当前本地资料未显示专门的 session.error hook 或对话问题专用 hook。
