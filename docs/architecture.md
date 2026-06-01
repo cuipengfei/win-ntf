@@ -35,3 +35,12 @@ agent hook
 - WPF 原生 UI 足以实现圆角、阴影、左侧颜色条、Topmost、不抢焦点等行为；因此初版不引入 WebView2。
 - 旧 prompts repo 的 Browser Notification/SSE 方案提供了 HTTP 端点与自启动思路，但 UI 不符合本项目目标。
 - 旧 prompts repo 的 FileWatcher/WPF 方案提供了 WPF popup 与 Win32 style 经验；本项目保留 UI 思路，通信层改成本地 HTTP。
+
+
+## Popup slot policy
+
+`WinNtf.Core.NotificationSlotQueue` 负责可见槽位分配。默认可见上限来自 `AppConfig.MaxVisible = 10`，`WinNtf.App.App` 启动时把该配置传入 `PopupPresenter`。
+
+当可见 popup 已满时，`PopupPresenter` 调用 `AcquireDroppingOldest()` 获取新 lease：队列关闭最早的 popup，给新通知复用同一 slot。lease 带 generation；旧 popup 的关闭回调如果晚到，只能释放匹配 generation 的 slot，避免 stale callback 把新 popup 的槽位释放掉。
+
+`PopupPresenter` 还会用 `NotificationDisplayKey` 去重仍可见的相同通知。key 由 `title`、`text`、`variant`、`color`、`position` 组成，不包含 `durationMs` / `persistent`；重复通知会复用原 popup、重置倒计时，并调用 `BumpToNewest()` 让该 popup 在 drop 顺序里变成最新。UI 层会重新排列当前可见窗口，把重复项移到栈顶。
