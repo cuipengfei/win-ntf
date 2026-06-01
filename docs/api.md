@@ -48,3 +48,21 @@ Content-Type: application/json
 
 - `400`: JSON 无效、`text` 为空、字段非法。
 - `413`: payload 超过限制。
+
+
+## App config
+
+配置文件位于 `%APPDATA%/win-ntf/config.json`。字段使用 camelCase JSON：
+
+```json
+{
+  "port": 9876,
+  "startOnLogin": true,
+  "defaultPosition": "TopRight",
+  "maxVisible": 10
+}
+```
+
+- `maxVisible` 必须大于等于 `1`，默认 `10`。
+- 同屏 popup 达到 `maxVisible` 后，新的通知仍会显示；程序会关闭最早的 popup 并复用其槽位。
+- 如果新通知与仍在显示的通知在 `title`、`text`、`variant`、`color`、`position` 上完全一致，程序不会再开一个重复 popup；已有 popup 会重置倒计时并移到栈顶。
