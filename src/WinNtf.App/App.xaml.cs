@@ -30,7 +30,7 @@ public partial class App : System.Windows.Application
             var config = new AppConfigStore(configPath).LoadOrCreate();
             new RegistryStartupManager().SetEnabled(config.StartOnLogin, CurrentExecutablePath());
 
-            var sink = new PopupPresenter();
+            var sink = new PopupPresenter(config.MaxVisible);
             _server = new LocalHttpServer(
                 new LocalHttpServerOptions(config.Port),
                 new NotificationNormalizer(),

@@ -11,13 +11,15 @@ namespace WinNtf.App;
 public partial class PopupWindow : Window
 {
     private readonly Action _onClosed;
-    private readonly DispatcherTimer? _closeTimer;
+    private readonly NotificationPosition _position;
+    private DispatcherTimer? _closeTimer;
     private bool _closed;
 
     public PopupWindow(NormalizedNotification notification, int slot, Action onClosed)
     {
         InitializeComponent();
         _onClosed = onClosed;
+        _position = notification.Position;
 
         TitleText.Text = notification.Title;
         BodyText.Text = notification.Text;
@@ -31,13 +33,31 @@ public partial class PopupWindow : Window
 
         if (notification.DurationMs > 0)
         {
-            _closeTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(notification.DurationMs) };
-            _closeTimer.Tick += (_, _) => Close();
-            _closeTimer.Start();
+            RestartTimer(notification.DurationMs);
         }
     }
 
     private void CloseButton_Click(object sender, RoutedEventArgs e) => Close();
+
+    public void RestartTimer(int durationMs)
+    {
+        _closeTimer?.Stop();
+        if (durationMs <= 0)
+        {
+            _closeTimer = null;
+            return;
+        }
+
+        _closeTimer ??= new DispatcherTimer();
+        _closeTimer.Interval = TimeSpan.FromMilliseconds(durationMs);
+        _closeTimer.Tick -= CloseOnTimer;
+        _closeTimer.Tick += CloseOnTimer;
+        _closeTimer.Start();
+    }
+
+    private void CloseOnTimer(object? sender, EventArgs e) => Close();
+
+    public void MoveToSlot(int slot) => ApplyPosition(_position, slot);
 
     private void PreventActivation()
     {
